@@ -3,68 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calm Centered Image</title>
+  <title>AI Customer Support</title>
   <style>
-    /* Reset and calm font */
+    /* Global reset and base style */
     * {
-      margin: 50px;
-      padding: 50px;
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       background: linear-gradient(to bottom, #eef2f3, #dfe6e9);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .image-container {
-      max-width: 90vw;
-      max-height: 80vh;
-      padding: 1rem;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    }
-
-    .title {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 2rem;
+      padding: 2rem 1rem;
       text-align: center;
-      color: #2c3e50;
-      letter-spacing: 1px;
     }
-    
-    .image-container img {
+
+    .info-box {
       width: 100%;
-      height: auto;
-      border-radius: 8px;
-      display: block;
+      max-width: 700px;
+      background-color: #ffffff;
+      border-left: 6px solid #4a90e2;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .info-box:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-box p {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #2c3e50;
+      margin: 0;
+    }
+
+    .elevenlabs {
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 700px;
     }
 
     @media (max-width: 600px) {
-      .image-container {
-        max-width: 95vw;
-        padding: 0.5rem;
+      .info-box p {
+        font-size: 1rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="title">Welcome to the 24/7 AI Customer Support that'll answer your questions about Area West Environmental Inc.</div>
-  <div class="title">Powered by AI-FOR-CE (For Demonstration Only)</div>
-  <div class="title">You only have around 5 minutes to talk to this AI agent. Please ask it simple questions such as "What services does Area West provide?" or "What projects has Area West done so far?" or "What is the contact info of Area West?"</div>
-  <div class="image-container">
-    <elevenlabs-convai agent-id="vthJMr7geGOT1H3kem7t"></elevenlabs-convai><script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+
+  <div class="info-box">
+    <p>Welcome to the 24/7 AI Customer Support that'll answer your questions about Area West Environmental Inc.</p>
   </div>
+
+  <div class="info-box">
+    <p>Powered by AI-FOR-CE (For Demonstration Only)</p>
+  </div>
+
+  <div class="info-box">
+    <p>You only have around 5 minutes to talk to this AI agent. Please ask it simple questions such as "What services does Area West provide?" or "What projects has Area West done so far?" or "What is the contact info of Area West?"</p>
+  </div>
+
+  <div class="elevenlabs">
+    <elevenlabs-convai agent-id="vthJMr7geGOT1H3kem7t"></elevenlabs-convai>
+    <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
+  </div>
+
 </body>
 </html>
-
-
