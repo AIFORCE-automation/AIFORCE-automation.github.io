@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lagunitas Roulette — Engineering Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Righteous&family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0e27;--ink2:#0f1435;--panel:#151b42;
+  --border:rgba(255,255,255,0.08);--muted:#5a6a9f;
+  --text:#e8ecff;--dim:#8491c4;
+  --primary:#ff006e;--primary2:#d9004f;
+  --accent:#00f5ff;--accent2:#00c3cc;
+  --gold:#ffd60a;--red:#ff4757;
+  --r:16px;--rs:10px;
+  --sh:0 24px 60px rgba(0,0,0,.7);
+}
+html,body{height:100%}
+body{
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg, #0a0e27 0%, #1a1f4d 100%);
+  color:var(--text);min-height:100vh;overflow-x:hidden;
+}
+
+/* BG */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.grd{
+  position:absolute;inset:0;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(255,0,110,.04) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(0,245,255,.04) 0%, transparent 50%);
+}
+.particles{position:absolute;inset:0}
+.particle{
+  position:absolute;width:3px;height:3px;border-radius:50%;
+  background:rgba(255,255,255,.3);
+  animation:float 20s infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) translateX(0)}
+  50%{transform:translateY(-100px) translateX(50px)}
+}
+
+/* LOADING */
+#loading{
+  position:fixed;inset:0;z-index:50;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;
+  background:linear-gradient(135deg, #0a0e27 0%, #1a1f4d 100%);
+}
+#loading.gone{display:none}
+.load-spin{
+  width:60px;height:60px;
+  border:4px solid rgba(255,0,110,.2);
+  border-top-color:var(--primary);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+.load-txt{
+  font-family:'JetBrains Mono',monospace;font-size:.82rem;
+  letter-spacing:.25em;text-transform:uppercase;color:var(--accent);
+}
+.load-err{font-size:.92rem;color:var(--red);text-align:center;max-width:480px;line-height:1.7;padding:0 1rem}
+.load-err code{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.88em}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SCREENS */
+.screen{
+  position:fixed;inset:0;z-index:10;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:1.5rem;overflow-y:auto;
+  transition:opacity .5s,transform .5s;
+}
+.screen.gone{opacity:0;transform:scale(.94);pointer-events:none}
+
+/* SPLASH */
+#splash{background:linear-gradient(135deg, #0a0e27 0%, #1a1f4d 100%)}
+
+.brand{text-align:center;margin-bottom:2.5rem;user-select:none}
+.brand-eye{
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;
+  letter-spacing:.4em;text-transform:uppercase;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:.6rem;
+}
+.brand-name{
+  font-family:'Righteous',sans-serif;
+  font-size:clamp(3.5rem,11vw,7rem);line-height:.95;
+  background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 40px rgba(255,0,110,.6));
+  animation:glow 2.5s ease-in-out infinite;
+  letter-spacing:-.02em;
+}
+@keyframes glow{
+  0%,100%{filter:drop-shadow(0 0 40px rgba(255,0,110,.6))}
+  50%{filter:drop-shadow(0 0 70px rgba(255,0,110,.9))}
+}
+.brand-sub{
+  font-size:1.05rem;letter-spacing:.08em;
+  color:var(--dim);margin-top:1rem;font-weight:500;
+}
+.qcount-badge{
+  display:inline-block;margin-top:1rem;
+  background:rgba(0,245,255,.12);border:1px solid rgba(0,245,255,.3);
+  border-radius:50px;padding:.3rem 1.1rem;
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--accent);
+  box-shadow:0 0 20px rgba(0,245,255,.2);
+}
+
+.splash-inner{
+  display:grid;grid-template-columns:450px 400px;gap:2rem;
+  width:100%;max-width:920px;align-items:start;
+}
+@media(max-width:920px){.splash-inner{grid-template-columns:1fr}}
+
+.card{
+  background:rgba(21,27,66,.6);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:2.5rem;
+  box-shadow:var(--sh);
+  backdrop-filter:blur(20px);
+}
+.flabel{
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:.55rem;display:block;
+}
+.afield{
+  width:100%;
+  background:rgba(15,20,53,.8);
+  border:2px solid rgba(255,0,110,.3);
+  border-radius:var(--rs);
+  padding:1rem 1.2rem;
+  font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:600;
+  color:#fff;letter-spacing:.04em;outline:none;
+  transition:all .3s;
+}
+.afield:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(255,0,110,.15), 0 0 30px rgba(255,0,110,.3);
+  transform:translateY(-2px);
+}
+.afield::placeholder{color:var(--muted);font-weight:400}
+
+.gobtn{
+  display:block;width:100%;margin-top:1.5rem;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  border:none;border-radius:var(--rs);padding:1.1rem;
+  font-family:'Righteous',sans-serif;font-size:1.7rem;letter-spacing:.08em;
+  color:#fff;cursor:pointer;text-transform:uppercase;
+  box-shadow:0 10px 40px rgba(255,0,110,.5);
+  transition:all .3s;
+}
+.gobtn:hover:not(:disabled){
+  transform:translateY(-3px);
+  box-shadow:0 15px 50px rgba(255,0,110,.7);
+}
+.gobtn:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* HOF */
+.hof-card{
+  background:rgba(21,27,66,.6);
+  border:1px solid rgba(255,215,0,.25);
+  border-radius:var(--r);
+  padding:1.8rem;
+  box-shadow:var(--sh);
+  backdrop-filter:blur(20px);
+}
+.hof-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.2rem;padding-bottom:.9rem;
+  border-bottom:1px solid rgba(255,215,0,.2);
+  flex-wrap:wrap;gap:.6rem;
+}
+.hof-title{
+  font-family:'Righteous',sans-serif;font-size:1.8rem;letter-spacing:.05em;
+  background:linear-gradient(135deg,var(--gold),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hof-badge{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+  background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);
+  border-radius:50px;padding:.25rem .8rem;
+}
+.hof-row{
+  display:flex;align-items:center;gap:.9rem;
+  padding:.7rem .5rem;border-radius:var(--rs);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  transition:all .2s;
+}
+.hof-row:last-child{border-bottom:none}
+.hof-row:hover{background:rgba(255,215,0,.06);transform:translateX(5px)}
+.hof-pos{
+  font-family:'Righteous',sans-serif;font-weight:700;
+  font-size:1.05rem;min-width:38px;text-align:center;
+}
+.hof-pos.p1{color:var(--gold)}.hof-pos.p2{color:#c0c0c0}.hof-pos.p3{color:#cd7f32}.hof-pos.px{color:var(--muted)}
+.hof-info{flex:1;min-width:0}
+.hof-name{font-weight:700;font-size:1rem;color:var(--text)}
+.hof-sub{font-size:.74rem;color:var(--dim);margin-top:.15rem}
+.hof-score{
+  font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:1.15rem;color:var(--gold);
+}
+.hof-empty{
+  font-size:.9rem;color:var(--muted);text-align:center;
+  padding:2rem 1rem;font-family:'JetBrains Mono',monospace;
+  line-height:1.8;
+}
+
+/* ══════════════════════════════════════════════════════
+   ROULETTE WHEEL
+══════════════════════════════════════════════════════ */
+#roulette{
+  background:linear-gradient(135deg, #0a0e27 0%, #1a1f4d 100%);
+}
+.roulette-container{
+  display:flex;flex-direction:column;align-items:center;gap:2rem;
+  max-width:650px;width:100%;
+}
+
+/* Branding on roulette screen */
+.roulette-brand{
+  font-family:'Righteous',sans-serif;
+  font-size:2.8rem;letter-spacing:-.02em;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 30px rgba(255,0,110,.5));
+  margin-bottom:.5rem;
+}
+
+.wheel-title{
+  font-family:'Righteous',sans-serif;font-size:1.8rem;
+  letter-spacing:.05em;text-align:center;color:var(--accent);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+
+.wheel-wrap{
+  position:relative;width:480px;height:480px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Outer luxury frame */
+.wheel-frame{
+  position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(135deg, #1a1f4d 0%, #0a0e27 100%);
+  box-shadow:
+    0 0 0 8px rgba(255,0,110,.2),
+    0 0 0 16px rgba(0,245,255,.15),
+    0 0 50px rgba(255,0,110,.3),
+    inset 0 0 60px rgba(0,0,0,.8);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Gold decorative ring */
+.wheel-ring{
+  position:absolute;inset:20px;border-radius:50%;
+  background:linear-gradient(135deg, rgba(255,215,0,.15) 0%, rgba(255,215,0,.05) 100%);
+  box-shadow:
+    0 0 0 3px rgba(255,215,0,.4),
+    inset 0 0 30px rgba(255,215,0,.2);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Canvas wheel */
+.wheel{
+  width:400px;height:400px;border-radius:50%;
+  position:relative;
+  box-shadow:
+    0 0 40px rgba(0,0,0,.9),
+    inset 0 0 50px rgba(0,0,0,.7);
+  transition:transform 5s cubic-bezier(.17,.67,.05,.99);
+}
+.wheel.spinning{pointer-events:none}
+
+/* Diamond pointer */
+.wheel-pointer{
+  position:absolute;top:-40px;left:50%;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:28px solid transparent;
+  border-right:28px solid transparent;
+  border-top:50px solid var(--gold);
+  filter:drop-shadow(0 8px 20px rgba(255,215,0,.9));
+  z-index:10;
+}
+.wheel-pointer::after{
+  content:'';position:absolute;
+  top:-50px;left:50%;transform:translateX(-50%);
+  width:12px;height:12px;border-radius:50%;
+  background:radial-gradient(circle, #fff 0%, var(--gold) 100%);
+  box-shadow:0 0 20px rgba(255,215,0,1);
+}
+
+/* Center hub */
+.wheel-center{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:100px;height:100px;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  border:5px solid var(--gold);
+  box-shadow:
+    0 0 40px rgba(255,0,110,.8),
+    inset 0 0 30px rgba(0,0,0,.5);
+  z-index:5;
+  display:flex;align-items:center;justify-content:center;
+}
+.wheel-center-inner{
+  width:70px;height:70px;border-radius:50%;
+  background:linear-gradient(135deg, rgba(0,245,255,.3) 0%, rgba(255,0,110,.3) 100%);
+  border:2px solid rgba(255,215,0,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Righteous',sans-serif;font-size:2.2rem;color:#fff;
+  text-shadow:0 0 20px rgba(255,0,110,.8);
+}
+
+.spin-btn{
+  background:linear-gradient(135deg,var(--gold),#ffaa00);
+  border:none;border-radius:var(--rs);
+  padding:1.3rem 3.5rem;
+  font-family:'Righteous',sans-serif;font-size:1.8rem;
+  letter-spacing:.1em;text-transform:uppercase;
+  color:#000;cursor:pointer;
+  box-shadow:0 12px 50px rgba(255,215,0,.7);
+  transition:all .3s;
+  border:3px solid rgba(255,255,255,.3);
+}
+.spin-btn:hover:not(:disabled){
+  transform:translateY(-5px) scale(1.08);
+  box-shadow:0 20px 70px rgba(255,215,0,.9);
+}
+.spin-btn:disabled{
+  opacity:.4;cursor:not-allowed;
+  transform:none;box-shadow:none;
+}
+
+/* ══════════════════════════════════════════════════════
+   GAME
+══════════════════════════════════════════════════════ */
+#game{
+  position:relative;z-index:1;display:none;
+  flex-direction:column;min-height:100vh;padding:1.5rem;
+}
+#game.on{display:flex}
+
+/* Game branding header */
+.game-brand{
+  text-align:center;margin-bottom:1rem;
+}
+.game-brand-name{
+  font-family:'Righteous',sans-serif;
+  font-size:2rem;letter-spacing:-.01em;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 20px rgba(255,0,110,.4));
+}
+
+.bar{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;
+  background:rgba(21,27,66,.7);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:1rem 1.6rem;margin-bottom:1.5rem;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+  backdrop-filter:blur(15px);
+}
+.bar-pl{display:flex;align-items:center;gap:.9rem}
+.avatar{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Righteous',sans-serif;font-size:1.1rem;color:#fff;
+  box-shadow:0 0 20px rgba(255,0,110,.5);
+}
+.plname{font-family:'Righteous',sans-serif;font-size:1.35rem;letter-spacing:.03em}
+
+.pills{display:flex;gap:.9rem;flex-wrap:wrap}
+.pill{
+  display:flex;align-items:center;gap:.5rem;
+  background:rgba(15,20,53,.7);
+  border:1px solid rgba(255,0,110,.25);
+  border-radius:50px;
+  padding:.4rem 1.1rem;
+  transition:all .3s;
+}
+.pill:hover{transform:translateY(-2px);box-shadow:0 5px 20px rgba(255,0,110,.3)}
+.pill.g{border-color:rgba(0,245,255,.35)}
+.pill.o{border-color:rgba(255,215,0,.35)}
+.pico{font-size:1.05rem}
+.plbl{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  color:var(--muted);letter-spacing:.12em;text-transform:uppercase;
+}
+.pval{
+  font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.15rem;
+}
+.pval.money{color:var(--accent)}
+.pval.fire{color:var(--gold)}
+.pval.bmp{animation:bump .5s ease-out}
+@keyframes bump{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+
+.layout{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;flex:1}
+
+/* Quiz card */
+.qcard{
+  background:rgba(21,27,66,.7);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:2.5rem;
+  box-shadow:var(--sh);
+  backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;
+}
+.qmeta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.6rem;flex-wrap:wrap;gap:.7rem;
+}
+.qnum{
+  font-family:'JetBrains Mono',monospace;font-size:.75rem;
+  letter-spacing:.25em;text-transform:uppercase;color:var(--muted);
+}
+.qmeta-right{display:flex;align-items:center;gap:.7rem}
+.qtag{
+  background:rgba(255,0,110,.15);
+  border:1px solid rgba(255,0,110,.3);
+  border-radius:50px;padding:.25rem .95rem;
+  font-size:.7rem;font-family:'JetBrains Mono',monospace;
+  color:var(--primary);text-transform:uppercase;letter-spacing:.15em;
+}
+.qdiff{
+  border-radius:50px;padding:.25rem .85rem;
+  font-size:.68rem;font-family:'JetBrains Mono',monospace;
+  text-transform:uppercase;letter-spacing:.14em;
+}
+.qdiff.Easy{background:rgba(0,245,255,.15);border:1px solid rgba(0,245,255,.3);color:var(--accent)}
+.qdiff.Medium{background:rgba(255,215,0,.15);border:1px solid rgba(255,215,0,.3);color:var(--gold)}
+.qdiff.Hard{background:rgba(255,71,87,.15);border:1px solid rgba(255,71,87,.3);color:var(--red)}
+
+.qprog{
+  width:100%;height:5px;
+  background:rgba(255,255,255,.08);
+  border-radius:3px;margin-bottom:1.6rem;overflow:hidden;
+}
+.qprog-bar{
+  height:100%;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  border-radius:3px;
+  transition:width .6s ease;
+}
+
+.qbody{
+  font-size:1.25rem;line-height:1.85;font-weight:500;
+  color:#fff;margin-bottom:2rem;flex:1;
+}
+
+.opts{display:grid;gap:1rem;margin-bottom:1.5rem}
+.opt{
+  display:flex;align-items:flex-start;gap:1rem;
+  background:rgba(15,20,53,.6);
+  border:2px solid rgba(255,255,255,.1);
+  border-radius:var(--rs);
+  padding:1.1rem 1.3rem;
+  cursor:pointer;text-align:left;
+  font-family:'Poppins',sans-serif;font-size:1.05rem;font-weight:500;
+  color:var(--text);
+  transition:all .25s;
+}
+.opt:hover:not([disabled]){
+  border-color:var(--primary);
+  background:rgba(255,0,110,.1);
+  transform:translateX(8px) scale(1.02);
+  box-shadow:0 8px 25px rgba(255,0,110,.3);
+}
+.opt.pk{
+  border-color:var(--primary);
+  background:rgba(255,0,110,.15);
+  box-shadow:0 0 25px rgba(255,0,110,.4);
+}
+.opt.ok{
+  border-color:var(--accent)!important;
+  background:rgba(0,245,255,.15)!important;
+  animation:rPulse .6s ease;
+}
+.opt.ng{
+  border-color:var(--red)!important;
+  background:rgba(255,71,87,.15)!important;
+  animation:rShake .5s ease;
+}
+.opt[disabled]{cursor:default;opacity:.75}
+@keyframes rPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+@keyframes rShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+
+.okey{
+  flex-shrink:0;width:32px;height:32px;border-radius:8px;
+  background:rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Righteous',sans-serif;font-size:.9rem;
+  font-weight:700;color:var(--muted);
+}
+.opt.pk .okey{background:var(--primary);color:#fff}
+.opt.ok .okey{background:var(--accent);color:#000}
+.opt.ng .okey{background:var(--red);color:#fff}
+.otxt{padding-top:.15rem;line-height:1.6}
+
+/* Result */
+.result{
+  display:none;border-radius:var(--rs);
+  padding:1.2rem 1.4rem;
+  font-size:.98rem;line-height:1.75;
+  margin-bottom:1.3rem;
+}
+.result.on{display:block}
+.result.correct{
+  background:rgba(0,245,255,.1);
+  border:1px solid rgba(0,245,255,.35);
+}
+.result.wrong{
+  background:rgba(255,71,87,.1);
+  border:1px solid rgba(255,71,87,.35);
+}
+.result-verdict{
+  font-family:'Righteous',sans-serif;font-size:1.6rem;
+  letter-spacing:.08em;margin-bottom:.5rem;
+  display:flex;align-items:center;gap:.6rem;
+}
+.result.correct .result-verdict{color:var(--accent)}
+.result.wrong .result-verdict{color:var(--red)}
+.result-expl-lbl{
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:var(--dim);margin-bottom:.35rem;margin-top:.8rem;
+}
+.result-expl{color:var(--dim)}
+
+.nextbtn{
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  border:none;border-radius:var(--rs);padding:1rem;
+  font-family:'Righteous',sans-serif;font-size:1.55rem;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:#fff;cursor:pointer;width:100%;
+  box-shadow:0 8px 30px rgba(255,0,110,.5);
+  transition:all .3s;display:none;
+}
+.nextbtn.on{display:block}
+.nextbtn:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 40px rgba(255,0,110,.7);
+}
+
+.countdown{
+  height:4px;background:rgba(255,255,255,.1);
+  border-radius:2px;margin-top:.7rem;overflow:hidden;display:none;
+}
+.countdown.on{display:block}
+.countdown-bar{
+  height:100%;background:var(--primary);
+  border-radius:2px;width:100%;transition:width linear;
+}
+
+/* Sidebar */
+.sidebar{display:flex;flex-direction:column;gap:1.5rem}
+.lbp{
+  background:rgba(21,27,66,.7);
+  border:1px solid var(--border);
+  border-radius:var(--r);padding:1.6rem;
+  box-shadow:var(--sh);
+  backdrop-filter:blur(20px);
+}
+.lbttl{
+  font-family:'Righteous',sans-serif;font-size:1.3rem;
+  letter-spacing:.05em;color:var(--primary);
+  margin-bottom:1.1rem;
+  border-bottom:1px solid var(--border);padding-bottom:.8rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.copy-btn{
+  font-family:'JetBrains Mono',monospace;font-size:.64rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  border-radius:50px;padding:.25rem .8rem;
+  cursor:pointer;transition:all .3s;
+}
+.copy-btn:hover{
+  color:var(--accent);
+  border-color:rgba(0,245,255,.5);
+  box-shadow:0 0 15px rgba(0,245,255,.3);
+}
+.copy-btn.copied{color:var(--accent);border-color:rgba(0,245,255,.5)}
+
+.lbrow{
+  display:flex;align-items:center;gap:.8rem;
+  padding:.7rem .5rem;border-radius:var(--rs);
+  transition:all .25s;margin-bottom:.25rem;
+  animation:ri .4s ease both;
+}
+@keyframes ri{from{opacity:0;transform:translateX(15px)}to{opacity:1;transform:none}}
+.lbrow.me{
+  background:rgba(255,0,110,.12);
+  border:1px solid rgba(255,0,110,.3);
+}
+.lbrow:not(.me):hover{background:rgba(255,255,255,.05)}
+.lbrnk{
+  font-family:'Righteous',sans-serif;font-weight:700;
+  font-size:.88rem;min-width:28px;text-align:right;
+}
+.lbrnk.G{color:var(--gold)}.lbrnk.S{color:#c0c0c0}.lbrnk.B{color:#cd7f32}.lbrnk.O{color:var(--muted)}
+.lbinf{flex:1;min-width:0}
+.lbnm{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbsc{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700}
+
+/* HOF compact */
+.hof-sm{
+  background:rgba(21,27,66,.7);
+  border:1px solid rgba(255,215,0,.25);
+  border-radius:var(--r);padding:1.4rem;
+  box-shadow:var(--sh);
+  backdrop-filter:blur(20px);
+}
+.hof-sm-ttl{
+  font-family:'Righteous',sans-serif;font-size:1.3rem;
+  letter-spacing:.05em;margin-bottom:.9rem;padding-bottom:.7rem;
+  border-bottom:1px solid rgba(255,215,0,.2);
+  background:linear-gradient(135deg,var(--gold),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hof-sm-row{
+  display:flex;align-items:center;gap:.8rem;
+  padding:.5rem .35rem;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.hof-sm-row:last-child{border-bottom:none}
+.hof-sm-pos{
+  font-family:'Righteous',sans-serif;font-weight:700;
+  font-size:.9rem;min-width:28px;text-align:center;
+}
+.hof-sm-pos.p1{color:var(--gold)}.hof-sm-pos.p2{color:#c0c0c0}.hof-sm-pos.p3{color:#cd7f32}.hof-sm-pos.px{color:var(--muted)}
+.hof-sm-nm{flex:1;font-size:.9rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hof-sm-sc{font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--gold);font-weight:700}
+
+/* DONE */
+#done{background:linear-gradient(135deg, #0a0e27 0%, #1a1f4d 100%)}
+.done-box{
+  background:rgba(21,27,66,.8);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:3rem;max-width:560px;width:100%;
+  text-align:center;
+  box-shadow:var(--sh);
+  backdrop-filter:blur(25px);
+}
+.done-brand{
+  font-family:'Righteous',sans-serif;
+  font-size:2.5rem;letter-spacing:-.01em;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:1rem;
+}
+.done-title{
+  font-family:'Righteous',sans-serif;font-size:3.2rem;
+  letter-spacing:.05em;
+  background:linear-gradient(135deg,var(--gold),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:.7rem;
+}
+.done-score{
+  font-family:'JetBrains Mono',monospace;font-size:2.5rem;
+  font-weight:700;color:var(--accent);margin:.8rem 0;
+}
+.done-stats{
+  display:flex;gap:1.2rem;justify-content:center;
+  margin:1.2rem 0;flex-wrap:wrap;
+}
+.done-stat{
+  background:rgba(15,20,53,.7);
+  border:1px solid rgba(255,0,110,.25);
+  border-radius:var(--rs);
+  padding:.7rem 1.3rem;text-align:center;
+}
+.done-stat-v{
+  font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:1.35rem;color:var(--primary);
+}
+.done-stat-l{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+.done-sub{
+  font-size:.98rem;color:var(--dim);
+  margin-bottom:1.8rem;line-height:1.7;
+}
+.play-again{
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  border:none;border-radius:var(--rs);
+  padding:1rem 2.5rem;
+  font-family:'Righteous',sans-serif;font-size:1.5rem;
+  letter-spacing:.08em;text-transform:uppercase;
+  color:#fff;cursor:pointer;
+  box-shadow:0 10px 40px rgba(255,0,110,.6);
+  transition:all .3s;
+}
+.play-again:hover{
+  transform:translateY(-3px);
+  box-shadow:0 15px 50px rgba(255,0,110,.8);
+}
+
+/* Burst */
+.burst{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;opacity:0;
+}
+.burst.pop{animation:bp .9s ease-out forwards}
+@keyframes bp{
+  0%{opacity:0;transform:scale(.3)}
+  40%{opacity:1;transform:scale(1.12)}
+  65%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(1.2)}
+}
+.burst-t{
+  font-family:'Righteous',sans-serif;
+  font-size:clamp(3rem,10vw,6rem);letter-spacing:.05em;
+  padding:1.5rem 3rem;border-radius:20px;
+  backdrop-filter:blur(15px);
+}
+.burst.ok .burst-t{
+  color:var(--accent);
+  background:rgba(0,245,255,.2);
+  text-shadow:0 0 50px var(--accent);
+  border:3px solid rgba(0,245,255,.5);
+}
+.burst.ng .burst-t{
+  color:var(--red);
+  background:rgba(255,71,87,.2);
+  text-shadow:0 0 50px var(--red);
+  border:3px solid rgba(255,71,87,.5);
+}
+
+#ccc{position:fixed;inset:0;z-index:199;pointer-events:none}
+
+@media(max-width:920px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{order:-1}
+  .wheel-wrap{width:380px;height:380px}
+  .wheel{width:320px;height:320px}
+}
+@media(max-width:580px){
+  .qcard{padding:1.8rem 1.4rem}
+  .bar{padding:.8rem 1rem}
+  .pills{gap:.6rem}
+  .wheel-wrap{width:320px;height:320px}
+  .wheel{width:270px;height:270px}
+  .roulette-brand{font-size:2.2rem}
+  .game-brand-name{font-size:1.6rem}
+}
+</style>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg">
+  <div class="grd"></div>
+  <div class="particles" id="particles"></div>
+</div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="load-spin"></div>
+  <div class="load-txt" id="loadTxt">Loading Lagunitas Roulette...</div>
+  <div class="load-err" id="loadErr" style="display:none"></div>
+</div>
+
+<!-- SPLASH -->
+<div class="screen gone" id="splash">
+  <div class="brand">
+    <div class="brand-eye">Engineering Knowledge Challenge</div>
+    <div class="brand-name">Lagunitas<br>Roulette</div>
+    <div class="brand-sub">Spin the wheel &middot; Test your skills &middot; Win big</div>
+    <div class="qcount-badge" id="qcountBadge">Loading...</div>
+  </div>
+  <div class="splash-inner">
+    <div class="card">
+      <label class="flabel" for="al">Your Name</label>
+      <input class="afield" id="al" type="text" placeholder="Enter your name..." maxlength="20" autocomplete="off" spellcheck="false"/>
+      <button class="gobtn" id="go" disabled>Let's Play</button>
+      <div style="margin-top:1.8rem;border-top:1px solid var(--border);padding-top:1.5rem">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:.9rem">🎮 This Device</div>
+        <div id="splashRows"></div>
+      </div>
+    </div>
+    <div class="hof-card">
+      <div class="hof-header">
+        <div class="hof-title">🏆 Hall of Fame</div>
+        <div class="hof-badge">All-Time Leaders</div>
+      </div>
+      <div id="hofRows"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ROULETTE -->
+<div class="screen gone" id="roulette">
+  <div class="roulette-container">
+    <div class="roulette-brand">Lagunitas Roulette</div>
+    <h2 class="wheel-title">Spin to Start!</h2>
+    <div class="wheel-wrap">
+      <div class="wheel-frame">
+        <div class="wheel-ring">
+          <canvas id="wheelCanvas" width="400" height="400" class="wheel"></canvas>
+        </div>
+      </div>
+      <div class="wheel-pointer"></div>
+      <div class="wheel-center">
+        <div class="wheel-center-inner">?</div>
+      </div>
+    </div>
+    <button class="spin-btn" id="spinBtn">SPIN NOW</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game">
+  <div class="game-brand">
+    <div class="game-brand-name">Lagunitas Roulette</div>
+  </div>
+  <div class="bar">
+    <div class="bar-pl">
+      <div class="avatar" id="av">?</div>
+      <div class="plname" id="pn">Player</div>
+    </div>
+    <div class="pills">
+      <div class="pill g"><span class="pico">💰</span><div><div class="plbl">Balance</div><div class="pval money" id="sc">$1,000</div></div></div>
+      <div class="pill o"><span class="pico">🔥</span><div><div class="plbl">Streak</div><div class="pval fire" id="stk">0</div></div></div>
+      <div class="pill"><span class="pico">📊</span><div><div class="plbl">Progress</div><div class="pval" id="prog">0/0</div></div></div>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="qcard">
+      <div class="qmeta">
+        <div class="qnum" id="qn">Question 1</div>
+        <div class="qmeta-right">
+          <div class="qtag" id="qt" style="display:none"></div>
+          <div class="qdiff" id="qd" style="display:none"></div>
+        </div>
+      </div>
+      <div class="qprog"><div class="qprog-bar" id="qpb" style="width:0%"></div></div>
+      <div class="qbody" id="qb"></div>
+      <div class="opts" id="op"></div>
+      <div class="result" id="res">
+        <div class="result-verdict" id="resVerdict"></div>
+        <div id="resCorrect" style="display:none;font-size:.92rem;color:var(--dim);margin-bottom:.35rem"></div>
+        <div class="result-expl-lbl">Explanation</div>
+        <div class="result-expl" id="resExpl"></div>
+      </div>
+      <button class="nextbtn" id="nxt">Next Question</button>
+      <div class="countdown" id="cd"><div class="countdown-bar" id="cdb"></div></div>
+    </div>
+    <div class="sidebar">
+      <div class="lbp">
+        <div class="lbttl"><span>Session Board</span><button class="copy-btn" id="copyBtn">Copy</button></div>
+        <div id="lb"></div>
+      </div>
+      <div class="hof-sm">
+        <div class="hof-sm-ttl">🏆 Hall of Fame</div>
+        <div id="hofSm"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div class="screen gone" id="done">
+  <div class="done-box">
+    <div class="done-brand">Lagunitas Roulette</div>
+    <div class="done-title">Game Over!</div>
+    <div class="done-score" id="doneScore">$1,000</div>
+    <div class="done-stats">
+      <div class="done-stat"><div class="done-stat-v" id="doneCorrect">0</div><div class="done-stat-l">Correct</div></div>
+      <div class="done-stat"><div class="done-stat-v" id="doneWrong">0</div><div class="done-stat-l">Wrong</div></div>
+      <div class="done-stat"><div class="done-stat-v" id="donePct">0%</div><div class="done-stat-l">Accuracy</div></div>
+      <div class="done-stat"><div class="done-stat-v" id="doneBest">0</div><div class="done-stat-l">Best Streak</div></div>
+    </div>
+    <div class="done-sub" id="doneSub"></div>
+    <button class="play-again" id="playAgain">Play Again</button>
+  </div>
+</div>
+
+<div class="burst" id="bst"><div class="burst-t" id="btxt"></div></div>
+<canvas id="ccc"></canvas>
+
+<script>
+/* Configuration */
+const CSV_URL = "questions.csv";
+const HALL_OF_FAME = [
+  // { n: "Player1", s: 3250 },
+];
+
+const FALLBACK_QUESTIONS = `#,Topic,Question,Option A,Option B,Option C,Option D,Answer,Explanation,Difficulty
+1,Geotechnical,"According to AASHTO LRFD §10.7.6, what is the primary method used to verify nominal pile resistance for driven steel H-piles in dense sand (N60 = 40)?",Fixed penetration depth of 10 feet into bearing stratum,Dynamic load testing (EOID or restrike) to confirm nominal resistance,"Static load test only, dynamic methods not permitted",Penetration refusal at 10 blows per inch,D,AASHTO LRFD §10.7.6 requires pile resistance be verified by dynamic load testing (End of Initial Drive or restrike) or static load test. Refusal criteria alone is insufficient — dynamic monitoring confirms actual nominal resistance.,Hard
+2,Hydraulics,A HEC-RAS model shows the 100-year water surface elevation at 127.4 ft NAVD88. The existing low chord of the bridge is at 126.8 ft. What minimum freeboard does AASHTO LRFD §2.6.4.4 require?,0.5 ft above the 100-year WSE,1.0 ft above the 100-year WSE,2.0 ft above the 100-year WSE,No clearance required if scour is acceptable,B,AASHTO LRFD §2.6.4.4 requires a minimum vertical clearance of 1.0 ft above the design flood elevation for navigable waterways. The existing low chord at 126.8 ft is 0.6 ft below the 100-year WSE and must be raised.,Medium
+3,Structural,"A prestressed concrete Florida-I beam (FIB-54) uses 0.6-inch diameter 270-ksi low-relaxation strand. Per ACI 318-19 §25.9.2, what is the design transfer length?",24 inches,36 inches,48 inches,60 inches,B,ACI 318-19 §25.9.2 defines transfer length as 60 × strand diameter. For 0.6-inch strand: 60 × 0.6 = 36 inches. Development length (60 inches) is a common distractor — transfer and development lengths are different.,Hard
+4,Materials,FDOT Specification 400 requires Class IV concrete for bridge substructure in a tidal zone. What are the minimum f'c and maximum water-cement ratio?,"f'c = 4,000 psi and w/c = 0.45","f'c = 5,500 psi and w/c = 0.40","f'c = 6,000 psi and w/c = 0.35","f'c = 3,500 psi and w/c = 0.50",B,"FDOT Specification §400-2.6 requires f'c ≥ 5,500 psi and w/c ≤ 0.40 for marine substructure in tidal/splash zones to ensure long-term durability against chloride penetration.",Medium
+5,Permits,A bridge widening adds a new span over a Section 10/404 waterway. Which USACE permits are required before in-water work begins?,Section 404 Individual Permit only,Section 10 and Section 404 authorization (or qualifying Nationwide Permit),Section 408 permission only,State ERP only — USACE not required for widening,B,"Work in navigable waters requires both Section 10 (Rivers and Harbors Act) and Section 404 (Clean Water Act) authorization from USACE. Nationwide Permit 14 (Linear Transportation) may apply for minor impacts under 0.1 acre.",Medium
+6,Construction,A contractor proposes grouting post-tensioned tendons 28 days after stressing. What does FDOT Specification Section 462 require?,Grouting within 7 days of stressing,Grouting within 14 days of stressing,Grouting within 24 hours of stressing,No time limit — grouting before final acceptance is sufficient,A,FDOT §462-6.3 requires post-tensioning ducts be grouted within 7 calendar days of stressing to minimize corrosion risk from moisture infiltration into ungrouted tendon sheaths.,Hard
+7,Inspection,An NBI inspection rates bridge deck Item 58 = 4. What does this mean and what action is triggered?,Good condition — no action required,Fair condition — monitor at next cycle,Poor condition — repair plan required; load restriction consideration,Critical condition — bridge must close immediately,C,"NBI Rating 4 (Poor) indicates advanced section loss, deterioration, spalling, or scour. It triggers a requirement for a repair plan and may require load posting. Rating 2 = Critical (closure required); Rating 5 = Fair.",Medium
+8,Loads,"Per AASHTO LRFD 9th Edition §3.6.1.2, which HL-93 combination governs maximum moment in a simply-supported span?",Design truck (72 kips) alone,Design tandem (50 kips) alone,"Greater of: [Design Truck + Lane Load] or [Design Tandem + Lane Load]",Design truck + tandem applied simultaneously with lane load,C,"AASHTO LRFD §3.6.1.2 requires taking the greater of: (Design Truck 8k+32k+32k + 0.64 klf lane load) OR (Design Tandem 2×25k + 0.64 klf lane load). Both must be checked; the controlling case governs design.",Hard
+9,Geotechnical,"A boring shows SPT N60 = 5 at 15 ft depth in saturated loose sand below the water table (FC = 8%). Site PGA = 0.15g. Per NCEER 1997 procedure, is liquefaction a concern?",No — PGA below 0.20g threshold,Yes — CSR likely exceeds CRR for N60 = 5 in loose saturated sand,No — fines content below 15% prevents liquefaction,Only a concern if groundwater is within 5 feet of surface,B,"NCEER 1997: CRR7.5 ≈ 0.09 for N60 = 5. At 0.15g PGA and 15-ft depth in saturated sand, CSR typically exceeds 0.09, indicating high liquefaction potential. Fines content of 8% does not preclude liquefaction; the FC correction is applied to CRR.",Hard
+10,Contracts,A contractor claims geotechnical boring log pile tip elevations are 'means and methods' rather than contract requirements. The boring logs are incorporated by reference. What is the correct response?,Agree — tip elevations are contractor's responsibility,Reject — incorporated boring logs make tip elevations minimum contract requirements subject to field verification,Partially agree — applies to test piles only,Issue a change order to add tip elevations to contract,B,"Geotechnical data incorporated by reference becomes a contract document. Pile tip elevations are minimum requirements. The contractor must reach them AND satisfy driving criteria or dynamic/static load testing per the contract specifications.",Medium`;
+
+/* CSV Parser */
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], n = text[i+1];
+    if (inQ) {
+      if (c === '"' && n === '"') { field += '"'; i++; }
+      else if (c === '"') inQ = false;
+      else field += c;
+    } else {
+      if (c === '"') inQ = true;
+      else if (c === ',') { row.push(field.trim()); field = ""; }
+      else if (c === '\n' || (c === '\r' && n === '\n')) {
+        if (c === '\r') i++;
+        row.push(field.trim()); field = "";
+        if (row.some(v => v)) rows.push(row);
+        row = [];
+      } else field += c;
+    }
+  }
+  if (field || row.length) { row.push(field.trim()); if (row.some(v=>v)) rows.push(row); }
+  return rows;
+}
+
+/* Question Bank */
+let BANK = [];
+
+function loadQuestions() {
+  return fetch(CSV_URL + "?v=" + Date.now())
+    .then(r => {
+      if (!r.ok) throw new Error("CSV not found (HTTP " + r.status + ")");
+      return r.text();
+    })
+    .then(txt => parseAndLoadCSV(txt))
+    .catch(err => {
+      console.warn("CSV load failed:", err.message, "— using fallback questions");
+      return parseAndLoadCSV(FALLBACK_QUESTIONS);
+    });
+}
+
+function parseAndLoadCSV(txt) {
+  const rows = parseCSV(txt);
+  const qs = rows.slice(1).filter(r => r.length >= 8 && /^[ABCD]$/i.test((r[7]||"").trim()));
+  if (!qs.length) throw new Error("No valid questions in CSV/fallback data.");
+  BANK = shuffle(qs.map(r => ({
+    topic: (r[1]||"General").trim(),
+    question: (r[2]||"").trim(),
+    options: [(r[3]||"").trim(), (r[4]||"").trim(), (r[5]||"").trim(), (r[6]||"").trim()],
+    answer: (r[7]||"").trim().toUpperCase(),
+    explanation: (r[8]||"").trim(),
+    difficulty: (r[9]||"Medium").trim(),
+  })));
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/* State */
+const G = {
+  alias:"", score:1000, streak:0, bestStreak:0,
+  qIdx:0, correct:0, wrong:0,
+  current:null, answered:false,
+  autoTimer:null
+};
+
+/* Leaderboard */
+const LBK = "lr1";
+const loadLB = () => { try{ return JSON.parse(localStorage.getItem(LBK))||[]; }catch{ return []; } };
+const saveLB = () => {
+  let a = loadLB(), i = a.findIndex(p => p.n === G.alias);
+  i >= 0 ? a[i].s = Math.max(a[i].s, G.score) : a.push({n:G.alias, s:G.score});
+  a.sort((x,y) => y.s - x.s);
+  localStorage.setItem(LBK, JSON.stringify(a.slice(0,20)));
+};
+
+/* Helpers */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const MED = ["🥇","🥈","🥉"];
+const posC = i => ["p1","p2","p3","px"][Math.min(i,3)];
+const rnkC = i => ["G","S","B","O"][Math.min(i,3)];
+
+/* HOF */
+function renderHOF(id, compact) {
+  const el = $(id); if (!el) return;
+  const sorted = [...HALL_OF_FAME].sort((a,b) => b.s - a.s);
+  if (!sorted.length) {
+    el.innerHTML = compact
+      ? '<div style="color:var(--muted);font-size:.85rem;padding:.6rem 0">Empty — be first!</div>'
+      : '<div class="hof-empty">No champions yet.<br>Be the first to claim glory!</div>';
+    return;
+  }
+  if (compact) {
+    el.innerHTML = sorted.map((p,i) =>
+      `<div class="hof-sm-row">
+        <div class="hof-sm-pos ${posC(i)}">${MED[i]||"#"+(i+1)}</div>
+        <div class="hof-sm-nm">${esc(p.n)}</div>
+        <div class="hof-sm-sc">$${p.s.toLocaleString()}</div>
+      </div>`).join("");
+  } else {
+    el.innerHTML = sorted.map((p,i) =>
+      `<div class="hof-row">
+        <div class="hof-pos ${posC(i)}">${MED[i]||"#"+(i+1)}</div>
+        <div class="hof-info">
+          <div class="hof-name">${esc(p.n)}</div>
+          <div class="hof-sub">Champion &bull; All-Time</div>
+        </div>
+        <div class="hof-score">$${p.s.toLocaleString()}</div>
+      </div>`).join("");
+  }
+}
+
+/* Local LB */
+function renderLB(id) {
+  const rows = loadLB(), el = $(id); if (!el) return;
+  if (!rows.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:.88rem;text-align:center;padding:1rem">No scores yet!</div>';
+    return;
+  }
+  el.innerHTML = rows.map((p,i) =>
+    `<div class="lbrow ${p.n===G.alias?'me':''}">
+      <div class="lbrnk ${rnkC(i)}">${MED[i]||"#"+(i+1)}</div>
+      <div class="lbinf">
+        <div class="lbnm">${esc(p.n)}${p.n===G.alias?' ← you':''}</div>
+        <div class="lbsc">$${p.s.toLocaleString()}</div>
+      </div>
+    </div>`).join("");
+}
+
+function renderSplash() {
+  const rows = loadLB(), el = $("splashRows"); if (!el) return;
+  if (!rows.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:.88rem">No scores yet.</div>';
+    return;
+  }
+  el.innerHTML = rows.slice(0,5).map((p,i) =>
+    `<div style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.92rem">
+      <span style="color:var(--primary);font-weight:700;min-width:2.2rem">${MED[i]||"#"+(i+1)}</span>
+      <span style="flex:1;color:var(--text)">${esc(p.n)}</span>
+      <span style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:700">$${p.s.toLocaleString()}</span>
+    </div>`).join("");
+}
+
+/* Copy Scores */
+$("copyBtn").addEventListener("click", () => {
+  const rows = loadLB();
+  if (!rows.length) { alert("No scores to copy yet!"); return; }
+  const txt = "LAGUNITAS ROULETTE — Hall of Fame\n"
+    + "====================================\n"
+    + "Paste into HALL_OF_FAME array:\n\n"
+    + rows.map(p => `  { n: "${p.n}", s: ${p.s} },`).join("\n")
+    + "\n\n--- Readable ---\n"
+    + rows.map((p,i) => `${i+1}. ${p.n.padEnd(22)} $${p.s.toLocaleString()}`).join("\n");
+  navigator.clipboard.writeText(txt)
+    .then(() => {
+      const b = $("copyBtn"); b.textContent = "Copied!"; b.classList.add("copied");
+      setTimeout(() => { b.textContent = "Copy"; b.classList.remove("copied"); }, 2500);
+    }).catch(() => prompt("Copy this:", txt));
+});
+
+/* Boot */
+loadQuestions()
+  .then(() => {
+    $("loading").classList.add("gone");
+    $("splash").classList.remove("gone");
+    const source = BANK.length === 10 ? " (demo)" : "";
+    $("qcountBadge").textContent = BANK.length + " questions loaded" + source;
+    renderSplash();
+    renderHOF("hofRows", false);
+    initParticles();
+  })
+  .catch(err => {
+    $("loadTxt").style.display = "none";
+    $("loadErr").style.display = "block";
+    $("loadErr").innerHTML =
+      `<strong>Fatal Error</strong><br><br>Could not load questions.<br><br>Error: ${esc(err.message)}`;
+  });
+
+/* Particles */
+function initParticles() {
+  const container = $("particles");
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    p.style.left = Math.random() * 100 + "%";
+    p.style.top = Math.random() * 100 + "%";
+    p.style.animationDelay = Math.random() * 20 + "s";
+    container.appendChild(p);
+  }
+}
+
+/* Splash Input */
+const al = $("al"), go = $("go");
+al.addEventListener("input", () => { go.disabled = al.value.trim().length < 2; });
+al.addEventListener("keydown", e => { if (e.key === "Enter" && !go.disabled) go.click(); });
+go.addEventListener("click", () => {
+  G.alias = al.value.trim();
+  G.score = 1000; G.streak = 0; G.bestStreak = 0;
+  G.correct = 0; G.wrong = 0; G.qIdx = 0;
+  $("pn").textContent = G.alias;
+  $("av").textContent = G.alias[0].toUpperCase();
+  $("splash").classList.add("gone");
+  setTimeout(() => {
+    $("roulette").classList.remove("gone");
+    initWheel();
+  }, 500);
+});
+
+/* ══════════════════════════════════════════════════════
+   LUXURY ROULETTE WHEEL
+══════════════════════════════════════════════════════ */
+let wheelCtx, wheelSpinning = false;
+const WHEEL_COLORS = [
+  {main:"#ff006e", shadow:"#d9004f"},  // Pink
+  {main:"#00f5ff", shadow:"#00c3cc"},  // Cyan
+  {main:"#ffd60a", shadow:"#ffaa00"},  // Gold
+  {main:"#8338ec", shadow:"#6d28d9"},  // Purple
+  {main:"#ff4757", shadow:"#ee5a6f"},  // Red
+  {main:"#3a86ff", shadow:"#2563eb"},  // Blue
+  {main:"#fb5607", shadow:"#ea580c"},  // Orange
+  {main:"#06ffa5", shadow:"#00d285"},  // Green
+];
+
+function initWheel() {
+  const canvas = $("wheelCanvas");
+  wheelCtx = canvas.getContext("2d");
+  drawWheel(0);
+}
+
+function drawWheel(rotation) {
+  const cx = 200, cy = 200, r = 200;
+  wheelCtx.clearRect(0,0,400,400);
+  
+  const segs = 8;
+  const arc = (Math.PI * 2) / segs;
+  
+  // Draw segments with gradients
+  for (let i = 0; i < segs; i++) {
+    const angle = i * arc + rotation;
+    const color = WHEEL_COLORS[i];
+    
+    // Create gradient
+    const gradient = wheelCtx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    gradient.addColorStop(0, color.main);
+    gradient.addColorStop(1, color.shadow);
+    
+    wheelCtx.beginPath();
+    wheelCtx.arc(cx, cy, r, angle, angle + arc);
+    wheelCtx.lineTo(cx, cy);
+    wheelCtx.fillStyle = gradient;
+    wheelCtx.fill();
+    
+    // Outer border
+    wheelCtx.strokeStyle = "#0a0e27";
+    wheelCtx.lineWidth = 4;
+    wheelCtx.stroke();
+    
+    // Inner gold accent lines
+    wheelCtx.beginPath();
+    wheelCtx.moveTo(cx, cy);
+    wheelCtx.lineTo(
+      cx + Math.cos(angle) * r,
+      cy + Math.sin(angle) * r
+    );
+    wheelCtx.strokeStyle = "rgba(255,215,0,.4)";
+    wheelCtx.lineWidth = 2;
+    wheelCtx.stroke();
+  }
+  
+  // Add decorative circles
+  for (let i = 0; i < 3; i++) {
+    const circleR = r - (i * 60);
+    wheelCtx.beginPath();
+    wheelCtx.arc(cx, cy, circleR, 0, Math.PI * 2);
+    wheelCtx.strokeStyle = `rgba(255,215,0,${0.2 - i * 0.05})`;
+    wheelCtx.lineWidth = 1.5;
+    wheelCtx.stroke();
+  }
+}
+
+$("spinBtn").addEventListener("click", () => {
+  if (wheelSpinning) return;
+  wheelSpinning = true;
+  $("spinBtn").disabled = true;
+  
+  const spins = 6 + Math.random() * 4;
+  const extra = Math.random() * Math.PI * 2;
+  const totalRot = spins * Math.PI * 2 + extra;
+  const duration = 5000;
+  const start = Date.now();
+  
+  function animate() {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const currentRot = eased * totalRot;
+    drawWheel(currentRot);
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      wheelSpinning = false;
+      setTimeout(() => {
+        $("roulette").classList.add("gone");
+        setTimeout(() => {
+          $("game").style.display = "flex";
+          renderLB("lb");
+          renderHOF("hofSm", true);
+          showQ();
+        }, 500);
+      }, 1000);
+    }
+  }
+  animate();
+});
+
+/* Show Question */
+function showQ() {
+  if (G.qIdx >= BANK.length) { endGame(); return; }
+  const q = BANK[G.qIdx];
+  G.current = q; G.answered = false;
+  if (G.autoTimer) clearTimeout(G.autoTimer);
+  $("res").className = "result";
+  $("nxt").className = "nextbtn";
+  $("cd").className = "countdown";
+  
+  $("qn").textContent = `Question ${G.qIdx + 1} of ${BANK.length}`;
+  const tag = $("qt"); tag.textContent = q.topic; tag.style.display = "block";
+  const dif = $("qd");
+  dif.textContent = q.difficulty; dif.className = "qdiff " + (q.difficulty||"Medium");
+  dif.style.display = "block";
+  
+  $("qpb").style.width = ((G.qIdx / BANK.length) * 100) + "%";
+  $("qb").textContent = q.question;
+  
+  const keys = ["A","B","C","D"];
+  $("op").innerHTML = q.options.map((opt, i) =>
+    `<button class="opt" data-k="${keys[i]}">
+      <span class="okey">${keys[i]}</span>
+      <span class="otxt">${esc(opt)}</span>
+    </button>`
+  ).join("");
+  $("op").querySelectorAll(".opt").forEach(b => b.addEventListener("click", answer));
+}
+
+/* Answer */
+function answer(e) {
+  if (G.answered) return;
+  G.answered = true;
+  const btn = e.currentTarget;
+  const chosen = btn.dataset.k;
+  const correct = G.current.answer;
+  const isOk = chosen === correct;
+  
+  $("op").querySelectorAll(".opt").forEach(b => {
+    b.setAttribute("disabled", true);
+    if (b.dataset.k === correct) b.classList.add("ok");
+    else if (b.dataset.k === chosen && !isOk) b.classList.add("ng");
+  });
+  btn.classList.add(isOk ? "ok" : "ng");
+  
+  if (isOk) {
+    G.streak++; G.correct++;
+    if (G.streak > G.bestStreak) G.bestStreak = G.streak;
+    const bonus = Math.min(G.streak - 1, 6) * 50;
+    const earned = 100 + bonus;
+    G.score += earned;
+    burst("ok", `+$${earned}${bonus ? " 🔥" : ""}!`);
+    if (G.streak >= 3) confetti();
+  } else {
+    G.streak = 0; G.wrong++;
+    G.score = Math.max(0, G.score - 100);
+    burst("ng", "−$100");
+  }
+  
+  const res = $("res");
+  res.className = "result on " + (isOk ? "correct" : "wrong");
+  $("resVerdict").innerHTML = isOk ? `✓ Correct!` : `✗ Wrong`;
+  const wc = $("resCorrect");
+  if (!isOk) {
+    wc.style.display = "block";
+    wc.textContent = `Correct: ${correct}) ${G.current.options["ABCD".indexOf(correct)]}`;
+  } else {
+    wc.style.display = "none";
+  }
+  $("resExpl").textContent = G.current.explanation || "No explanation.";
+  
+  hud(); saveLB(); renderLB("lb");
+  
+  const nxt = $("nxt");
+  nxt.className = "nextbtn on";
+  nxt.textContent = (G.qIdx + 1 >= BANK.length) ? "See Results" : "Next Question";
+  
+  const cd = $("cd"), cdb = $("cdb");
+  cd.className = "countdown on";
+  cdb.style.transition = "none"; cdb.style.width = "100%";
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      cdb.style.transition = "width 8s linear";
+      cdb.style.width = "0%";
+    });
+  });
+  G.autoTimer = setTimeout(advance, 8000);
+}
+
+$("nxt").addEventListener("click", () => {
+  if (G.autoTimer) clearTimeout(G.autoTimer);
+  advance();
+});
+
+function advance() {
+  G.qIdx++;
+  if (G.qIdx >= BANK.length) { endGame(); return; }
+  showQ();
+}
+
+/* HUD */
+function hud() {
+  $("sc").textContent = "$" + G.score.toLocaleString();
+  $("stk").textContent = G.streak;
+  $("prog").textContent = `${G.qIdx}/${BANK.length}`;
+  ["sc","stk"].forEach(id => {
+    const e=$(id); e.classList.remove("bmp"); void e.offsetWidth; e.classList.add("bmp");
+  });
+}
+
+/* End Game */
+function endGame() {
+  saveLB();
+  $("game").style.display = "none";
+  $("done").classList.remove("gone");
+  $("doneScore").textContent = "$" + G.score.toLocaleString();
+  $("doneCorrect").textContent = G.correct;
+  $("doneWrong").textContent = G.wrong;
+  $("donePct").textContent = Math.round((G.correct / BANK.length) * 100) + "%";
+  $("doneBest").textContent = G.bestStreak;
+  const pct = Math.round((G.correct / BANK.length) * 100);
+  $("doneSub").textContent = pct >= 85
+    ? "Legendary! You're a true champion!"
+    : pct >= 70
+    ? "Impressive! You know your stuff."
+    : pct >= 50
+    ? "Good effort! Keep practicing."
+    : "Keep going — every game makes you stronger!";
+  if (pct >= 85) confetti();
+}
+
+/* Play Again */
+$("playAgain").addEventListener("click", () => {
+  $("done").classList.add("gone");
+  shuffle(BANK);
+  G.score = 1000; G.streak = 0; G.bestStreak = 0;
+  G.correct = 0; G.wrong = 0; G.qIdx = 0;
+  setTimeout(() => {
+    $("roulette").classList.remove("gone");
+    drawWheel(0);
+    $("spinBtn").disabled = false;
+  }, 500);
+});
+
+/* Burst */
+function burst(cls, msg) {
+  const e = $("bst"); $("btxt").textContent = msg;
+  e.className = `burst ${cls} pop`;
+  setTimeout(() => e.classList.remove("pop"), 900);
+}
+
+/* Confetti */
+const cv = $("ccc"), cx = cv.getContext("2d"); let cp = [];
+function confetti() {
+  cv.width = innerWidth; cv.height = innerHeight;
+  const cols = ["#ff006e","#00f5ff","#ffd60a","#8338ec","#ff4757"];
+  cp = Array.from({length:150}, () => ({
+    x: Math.random()*cv.width, y:-12, r:3+Math.random()*6,
+    c: cols[~~(Math.random()*cols.length)],
+    vx:(Math.random()-.5)*7, vy:2+Math.random()*5,
+    rot:Math.random()*360, rs:(Math.random()-.5)*10
+  }));
+  requestAnimationFrame(drawC);
+}
+function drawC() {
+  cx.clearRect(0,0,cv.width,cv.height);
+  cp = cp.filter(p => p.y < cv.height+20);
+  cp.forEach(p => {
+    p.x+=p.vx; p.y+=p.vy; p.rot+=p.rs;
+    cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot*Math.PI/180);
+    cx.fillStyle=p.c; cx.fillRect(-p.r,-p.r/2,p.r*2,p.r); cx.restore();
+  });
+  cp.length ? requestAnimationFrame(drawC) : cx.clearRect(0,0,cv.width,cv.height);
+}
+window.addEventListener("resize", () => { cv.width=innerWidth; cv.height=innerHeight; });
+</script>
+</body>
+</html>
