@@ -1359,9 +1359,11 @@ $("spinBtn").addEventListener("click", () => {
       setTimeout(() => {
         $("roulette").classList.add("gone");
         setTimeout(() => {
-          $("game").style.display = "flex";
+          const game = $("game");
+          game.style.display = "flex";
+          game.classList.add("on");
           renderLB("lb");
-          renderHOF("hofSm", true);
+          updateKnowledgeDisplay();
           showQ();
         }, 500);
       }, 1000);
@@ -1372,8 +1374,18 @@ $("spinBtn").addEventListener("click", () => {
 
 /* Show Question */
 function showQ() {
-  if (G.qIdx >= BANK.length) { endGame(); return; }
+  console.log("showQ called - qIdx:", G.qIdx, "BANK.length:", BANK.length);
+  if (G.qIdx >= BANK.length) { 
+    console.log("No more questions - ending game");
+    endGame(); 
+    return; 
+  }
   const q = BANK[G.qIdx];
+  console.log("Loading question:", q);
+  if (!q) {
+    console.error("Question is undefined at index", G.qIdx);
+    return;
+  }
   G.current = q; G.answered = false;
   if (G.autoTimer) clearTimeout(G.autoTimer);
   $("res").className = "result";
@@ -1381,9 +1393,12 @@ function showQ() {
   $("cd").className = "countdown";
   
   $("qn").textContent = `Question ${G.qIdx + 1} of ${BANK.length}`;
-  const tag = $("qt"); tag.textContent = q.topic; tag.style.display = "block";
+  const tag = $("qt"); 
+  tag.textContent = q.topic; 
+  tag.style.display = "block";
   const dif = $("qd");
-  dif.textContent = q.difficulty; dif.className = "qdiff " + (q.difficulty||"Medium");
+  dif.textContent = q.difficulty; 
+  dif.className = "qdiff " + (q.difficulty||"Medium");
   dif.style.display = "block";
   
   $("qpb").style.width = ((G.qIdx / BANK.length) * 100) + "%";
@@ -1397,6 +1412,7 @@ function showQ() {
     </button>`
   ).join("");
   $("op").querySelectorAll(".opt").forEach(b => b.addEventListener("click", answer));
+  console.log("Question displayed successfully");
 }
 
 /* Answer */
@@ -1498,7 +1514,9 @@ function hud() {
 function endGame() {
   G.completed = true;
   saveLB();
-  $("game").style.display = "none";
+  const game = $("game");
+  game.style.display = "none";
+  game.classList.remove("on");
   $("done").classList.remove("gone");
   $("doneScore").textContent = "$" + G.score.toLocaleString();
   $("doneCorrect").textContent = G.correct;
