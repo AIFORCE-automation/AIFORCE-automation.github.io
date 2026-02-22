@@ -163,56 +163,83 @@ body{
 }
 .gobtn:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
 
-/* HOF */
-.hof-card{
+/* Knowledge Stats */
+.stats-card{
   background:rgba(21,27,66,.6);
-  border:1px solid rgba(255,215,0,.25);
+  border:1px solid rgba(0,245,255,.25);
   border-radius:var(--r);
   padding:1.8rem;
   box-shadow:var(--sh);
   backdrop-filter:blur(20px);
 }
-.hof-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:1.2rem;padding-bottom:.9rem;
-  border-bottom:1px solid rgba(255,215,0,.2);
-  flex-wrap:wrap;gap:.6rem;
+.stats-header{
+  text-align:center;
+  margin-bottom:1.5rem;
+  padding-bottom:1rem;
+  border-bottom:1px solid rgba(0,245,255,.2);
 }
-.hof-title{
+.stats-title{
   font-family:'Righteous',sans-serif;font-size:1.8rem;letter-spacing:.05em;
-  background:linear-gradient(135deg,var(--gold),var(--accent));
+  background:linear-gradient(135deg,var(--accent),var(--primary));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:.5rem;
 }
-.hof-badge{
-  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+.stats-subtitle{
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;
   letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
-  background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);
-  border-radius:50px;padding:.25rem .8rem;
 }
-.hof-row{
-  display:flex;align-items:center;gap:.9rem;
-  padding:.7rem .5rem;border-radius:var(--rs);
-  border-bottom:1px solid rgba(255,255,255,.05);
-  transition:all .2s;
+
+.knowledge-meter{
+  text-align:center;margin-bottom:2rem;
 }
-.hof-row:last-child{border-bottom:none}
-.hof-row:hover{background:rgba(255,215,0,.06);transform:translateX(5px)}
-.hof-pos{
-  font-family:'Righteous',sans-serif;font-weight:700;
-  font-size:1.05rem;min-width:38px;text-align:center;
+.knowledge-pct{
+  font-family:'Righteous',sans-serif;font-size:4rem;
+  background:linear-gradient(135deg,var(--accent),var(--primary));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;margin-bottom:.5rem;
+  filter:drop-shadow(0 0 30px rgba(0,245,255,.4));
 }
-.hof-pos.p1{color:var(--gold)}.hof-pos.p2{color:#c0c0c0}.hof-pos.p3{color:#cd7f32}.hof-pos.px{color:var(--muted)}
-.hof-info{flex:1;min-width:0}
-.hof-name{font-weight:700;font-size:1rem;color:var(--text)}
-.hof-sub{font-size:.74rem;color:var(--dim);margin-top:.15rem}
-.hof-score{
-  font-family:'JetBrains Mono',monospace;font-weight:700;
-  font-size:1.15rem;color:var(--gold);
+.knowledge-label{
+  font-size:.9rem;color:var(--dim);letter-spacing:.05em;
 }
-.hof-empty{
-  font-size:.9rem;color:var(--muted);text-align:center;
-  padding:2rem 1rem;font-family:'JetBrains Mono',monospace;
-  line-height:1.8;
+
+.badge-showcase{
+  display:flex;flex-direction:column;gap:1rem;
+}
+.badge-item{
+  display:flex;align-items:center;gap:1rem;
+  background:rgba(15,20,53,.6);
+  border:2px solid rgba(0,245,255,.2);
+  border-radius:var(--rs);
+  padding:1rem;
+  transition:all .3s;
+}
+.badge-item:hover{
+  border-color:var(--accent);
+  transform:translateX(5px);
+  box-shadow:0 5px 20px rgba(0,245,255,.2);
+}
+.badge-icon{
+  font-size:2.5rem;
+  flex-shrink:0;
+  width:60px;height:60px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(0,245,255,.15),rgba(255,0,110,.15));
+  border-radius:50%;
+  border:2px solid rgba(0,245,255,.3);
+}
+.badge-info{flex:1}
+.badge-name{
+  font-family:'Righteous',sans-serif;font-size:1.1rem;
+  color:var(--text);margin-bottom:.2rem;
+}
+.badge-desc{
+  font-size:.82rem;color:var(--dim);line-height:1.4;
+}
+.badge-locked{opacity:.4}
+.badge-locked .badge-icon{
+  background:rgba(90,106,159,.15);
+  border-color:rgba(90,106,159,.3);
 }
 
 /* ══════════════════════════════════════════════════════
@@ -618,34 +645,57 @@ body{
 .lbnm{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lbsc{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent);font-weight:700}
 
-/* HOF compact */
-.hof-sm{
+/* Stats compact sidebar */
+.stats-sm{
   background:rgba(21,27,66,.7);
-  border:1px solid rgba(255,215,0,.25);
+  border:1px solid rgba(0,245,255,.25);
   border-radius:var(--r);padding:1.4rem;
   box-shadow:var(--sh);
   backdrop-filter:blur(20px);
 }
-.hof-sm-ttl{
+.stats-sm-ttl{
   font-family:'Righteous',sans-serif;font-size:1.3rem;
   letter-spacing:.05em;margin-bottom:.9rem;padding-bottom:.7rem;
-  border-bottom:1px solid rgba(255,215,0,.2);
-  background:linear-gradient(135deg,var(--gold),var(--accent));
+  text-align:center;
+  border-bottom:1px solid rgba(0,245,255,.2);
+  background:linear-gradient(135deg,var(--accent),var(--primary));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
-.hof-sm-row{
-  display:flex;align-items:center;gap:.8rem;
-  padding:.5rem .35rem;
-  border-bottom:1px solid rgba(255,255,255,.05);
+.stats-sm-meter{
+  text-align:center;margin-bottom:1.2rem;
 }
-.hof-sm-row:last-child{border-bottom:none}
-.hof-sm-pos{
-  font-family:'Righteous',sans-serif;font-weight:700;
-  font-size:.9rem;min-width:28px;text-align:center;
+.stats-sm-pct{
+  font-family:'Righteous',sans-serif;font-size:2.8rem;
+  background:linear-gradient(135deg,var(--accent),var(--primary));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;
 }
-.hof-sm-pos.p1{color:var(--gold)}.hof-sm-pos.p2{color:#c0c0c0}.hof-sm-pos.p3{color:#cd7f32}.hof-sm-pos.px{color:var(--muted)}
-.hof-sm-nm{flex:1;font-size:.9rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hof-sm-sc{font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--gold);font-weight:700}
+.stats-sm-label{
+  font-size:.75rem;color:var(--dim);margin-top:.3rem;
+}
+.badge-mini{
+  display:flex;align-items:center;gap:.7rem;
+  padding:.6rem;
+  background:rgba(15,20,53,.5);
+  border:1px solid rgba(0,245,255,.15);
+  border-radius:var(--rs);
+  margin-bottom:.5rem;
+}
+.badge-mini:last-child{margin-bottom:0}
+.badge-mini-icon{
+  font-size:1.8rem;
+  flex-shrink:0;
+}
+.badge-mini-info{flex:1;min-width:0}
+.badge-mini-name{
+  font-size:.85rem;font-weight:600;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.badge-mini-desc{
+  font-size:.7rem;color:var(--dim);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.badge-mini.locked{opacity:.35}
 
 /* DONE */
 #done{background:linear-gradient(135deg, #0a0e27 0%, #1a1f4d 100%)}
@@ -794,12 +844,16 @@ body{
         <div id="splashRows"></div>
       </div>
     </div>
-    <div class="hof-card">
-      <div class="hof-header">
-        <div class="hof-title">🏆 Hall of Fame</div>
-        <div class="hof-badge">All-Time Leaders</div>
+    <div class="stats-card">
+      <div class="stats-header">
+        <div class="stats-title">📊 Your Knowledge</div>
+        <div class="stats-subtitle">Project Mastery Level</div>
       </div>
-      <div id="hofRows"></div>
+      <div class="knowledge-meter">
+        <div class="knowledge-pct" id="splashPct">--</div>
+        <div class="knowledge-label">Correct Answers</div>
+      </div>
+      <div class="badge-showcase" id="splashBadges"></div>
     </div>
   </div>
 </div>
@@ -866,9 +920,13 @@ body{
         <div class="lbttl"><span>Session Board</span><button class="copy-btn" id="copyBtn">Copy</button></div>
         <div id="lb"></div>
       </div>
-      <div class="hof-sm">
-        <div class="hof-sm-ttl">🏆 Hall of Fame</div>
-        <div id="hofSm"></div>
+      <div class="stats-sm">
+        <div class="stats-sm-ttl">📊 Knowledge</div>
+        <div class="stats-sm-meter">
+          <div class="stats-sm-pct" id="gamePct">0%</div>
+          <div class="stats-sm-label">Accuracy</div>
+        </div>
+        <div id="gameBadges"></div>
       </div>
     </div>
   </div>
@@ -897,9 +955,6 @@ body{
 <script>
 /* Configuration */
 const CSV_URL = "questions.csv";
-const HALL_OF_FAME = [
-  // { n: "Player1", s: 3250 },
-];
 
 const FALLBACK_QUESTIONS = `#,Topic,Question,Option A,Option B,Option C,Option D,Answer,Explanation,Difficulty
 1,Geotechnical,"According to AASHTO LRFD §10.7.6, what is the primary method used to verify nominal pile resistance for driven steel H-piles in dense sand (N60 = 40)?",Fixed penetration depth of 10 feet into bearing stratum,Dynamic load testing (EOID or restrike) to confirm nominal resistance,"Static load test only, dynamic methods not permitted",Penetration refusal at 10 blows per inch,D,AASHTO LRFD §10.7.6 requires pile resistance be verified by dynamic load testing (End of Initial Drive or restrike) or static load test. Refusal criteria alone is insufficient — dynamic monitoring confirms actual nominal resistance.,Hard
@@ -940,23 +995,36 @@ function parseCSV(text) {
 
 /* Question Bank */
 let BANK = [];
+let CSV_LOADED = false;
 
 function loadQuestions() {
+  console.log("Attempting to load CSV from:", CSV_URL);
   return fetch(CSV_URL + "?v=" + Date.now())
     .then(r => {
+      console.log("CSV fetch response status:", r.status);
       if (!r.ok) throw new Error("CSV not found (HTTP " + r.status + ")");
       return r.text();
     })
-    .then(txt => parseAndLoadCSV(txt))
+    .then(txt => {
+      console.log("CSV loaded successfully, length:", txt.length);
+      CSV_LOADED = true;
+      return parseAndLoadCSV(txt);
+    })
     .catch(err => {
-      console.warn("CSV load failed:", err.message, "— using fallback questions");
+      console.warn("CSV load failed:", err.message);
+      console.warn("Using fallback questions. To use your CSV:");
+      console.warn("1. Upload both index.html and questions.csv to GitHub Pages");
+      console.warn("2. Or run a local server: python -m http.server");
+      CSV_LOADED = false;
       return parseAndLoadCSV(FALLBACK_QUESTIONS);
     });
 }
 
 function parseAndLoadCSV(txt) {
   const rows = parseCSV(txt);
+  console.log("Parsed CSV rows:", rows.length);
   const qs = rows.slice(1).filter(r => r.length >= 8 && /^[ABCD]$/i.test((r[7]||"").trim()));
+  console.log("Valid questions found:", qs.length);
   if (!qs.length) throw new Error("No valid questions in CSV/fallback data.");
   BANK = shuffle(qs.map(r => ({
     topic: (r[1]||"General").trim(),
@@ -966,6 +1034,7 @@ function parseAndLoadCSV(txt) {
     explanation: (r[8]||"").trim(),
     difficulty: (r[9]||"Medium").trim(),
   })));
+  console.log("Question bank ready with", BANK.length, "questions");
 }
 
 function shuffle(arr) {
@@ -1001,34 +1070,97 @@ const MED = ["🥇","🥈","🥉"];
 const posC = i => ["p1","p2","p3","px"][Math.min(i,3)];
 const rnkC = i => ["G","S","B","O"][Math.min(i,3)];
 
-/* HOF */
-function renderHOF(id, compact) {
-  const el = $(id); if (!el) return;
-  const sorted = [...HALL_OF_FAME].sort((a,b) => b.s - a.s);
-  if (!sorted.length) {
-    el.innerHTML = compact
-      ? '<div style="color:var(--muted);font-size:.85rem;padding:.6rem 0">Empty — be first!</div>'
-      : '<div class="hof-empty">No champions yet.<br>Be the first to claim glory!</div>';
-    return;
-  }
+/* Badge System */
+const BADGES = [
+  {icon:"🐢",name:"Turtle Pace",desc:"Slow and steady... but you're learning!",condition:s=>s.avgTime>10,unlock:s=>s.qIdx>=3},
+  {icon:"🐇",name:"Speed Demon",desc:"Quick answers! Are you guessing or genius?",condition:s=>s.avgTime<3,unlock:s=>s.qIdx>=5},
+  {icon:"🔥",name:"Hot Streak",desc:"3+ correct in a row — you're on fire!",condition:s=>s.streak>=3,unlock:s=>true},
+  {icon:"❄️",name:"Ice Cold",desc:"Missed 3 in a row... time to warm up!",condition:s=>s.coldStreak>=3,unlock:s=>true},
+  {icon:"🐴",name:"Dark Horse",desc:"Underdog comeback! From zero to hero!",condition:s=>s.comeback>=3,unlock:s=>s.qIdx>=5},
+  {icon:"⚔️",name:"Knight Slayer",desc:"Conquered 3+ Hard questions — legend!",condition:s=>s.hardCorrect>=3,unlock:s=>true},
+  {icon:"🎯",name:"Bullseye",desc:"100% accuracy on 5+ questions!",condition:s=>s.perfect5,unlock:s=>s.qIdx>=5},
+  {icon:"🧠",name:"Big Brain",desc:"80%+ overall accuracy — true master!",condition:s=>s.accuracy>=80,unlock:s=>s.qIdx>=8},
+  {icon:"🤡",name:"Class Clown",desc:"More wrong than right... entertain us!",condition:s=>s.accuracy<40&&s.qIdx>=5,unlock:s=>s.qIdx>=5},
+  {icon:"💎",name:"Diamond Hands",desc:"Never gave up — finished all questions!",condition:s=>s.completed,unlock:s=>true},
+];
+
+function calculateStats(history) {
+  const stats = {
+    qIdx: G.qIdx,
+    streak: G.streak,
+    coldStreak: G.coldStreak || 0,
+    comeback: G.comeback || 0,
+    hardCorrect: G.hardCorrect || 0,
+    accuracy: G.qIdx > 0 ? Math.round((G.correct/G.qIdx)*100) : 0,
+    avgTime: 5, // placeholder
+    perfect5: G.qIdx >= 5 && G.correct === G.qIdx,
+    completed: G.qIdx >= BANK.length && G.qIdx > 0,
+  };
+  return stats;
+}
+
+function getEarnedBadges() {
+  const stats = calculateStats();
+  return BADGES.filter(b => b.unlock(stats) && b.condition(stats));
+}
+
+function renderBadges(containerId, compact=false) {
+  const el = $(containerId); if (!el) return;
+  const earned = getEarnedBadges();
+  const locked = BADGES.filter(b => !earned.includes(b));
+  
   if (compact) {
-    el.innerHTML = sorted.map((p,i) =>
-      `<div class="hof-sm-row">
-        <div class="hof-sm-pos ${posC(i)}">${MED[i]||"#"+(i+1)}</div>
-        <div class="hof-sm-nm">${esc(p.n)}</div>
-        <div class="hof-sm-sc">$${p.s.toLocaleString()}</div>
-      </div>`).join("");
-  } else {
-    el.innerHTML = sorted.map((p,i) =>
-      `<div class="hof-row">
-        <div class="hof-pos ${posC(i)}">${MED[i]||"#"+(i+1)}</div>
-        <div class="hof-info">
-          <div class="hof-name">${esc(p.n)}</div>
-          <div class="hof-sub">Champion &bull; All-Time</div>
+    const show = earned.slice(0,3);
+    el.innerHTML = show.map(b => 
+      `<div class="badge-mini">
+        <div class="badge-mini-icon">${b.icon}</div>
+        <div class="badge-mini-info">
+          <div class="badge-mini-name">${b.name}</div>
+          <div class="badge-mini-desc">${b.desc}</div>
         </div>
-        <div class="hof-score">$${p.s.toLocaleString()}</div>
-      </div>`).join("");
+      </div>`
+    ).join("") + (earned.length > 3 ? 
+      `<div style="text-align:center;color:var(--muted);font-size:.75rem;margin-top:.5rem">+${earned.length-3} more badges</div>` : "");
+    
+    if (earned.length === 0) {
+      el.innerHTML = '<div style="color:var(--muted);font-size:.82rem;text-align:center;padding:.8rem">Play to earn badges!</div>';
+    }
+  } else {
+    el.innerHTML = earned.map(b => 
+      `<div class="badge-item">
+        <div class="badge-icon">${b.icon}</div>
+        <div class="badge-info">
+          <div class="badge-name">${b.name}</div>
+          <div class="badge-desc">${b.desc}</div>
+        </div>
+      </div>`
+    ).join("") + locked.slice(0,2).map(b => 
+      `<div class="badge-item badge-locked">
+        <div class="badge-icon">🔒</div>
+        <div class="badge-info">
+          <div class="badge-name">???</div>
+          <div class="badge-desc">Keep playing to unlock...</div>
+        </div>
+      </div>`
+    ).join("");
+    
+    if (earned.length === 0) {
+      el.innerHTML = '<div style="color:var(--muted);font-size:.88rem;text-align:center;padding:2rem 1rem">Start playing to earn badges and track your knowledge!</div>';
+    }
   }
+}
+
+function updateKnowledgeDisplay() {
+  const pct = G.qIdx > 0 ? Math.round((G.correct/G.qIdx)*100) : 0;
+  
+  const splashPct = $("splashPct");
+  if (splashPct) splashPct.textContent = pct + "%";
+  
+  const gamePct = $("gamePct");
+  if (gamePct) gamePct.textContent = pct + "%";
+  
+  renderBadges("splashBadges", false);
+  renderBadges("gameBadges", true);
 }
 
 /* Local LB */
@@ -1084,10 +1216,13 @@ loadQuestions()
   .then(() => {
     $("loading").classList.add("gone");
     $("splash").classList.remove("gone");
-    const source = BANK.length === 10 ? " (demo)" : "";
+    const source = CSV_LOADED ? " ✓" : " (using demo questions - upload CSV to GitHub)";
     $("qcountBadge").textContent = BANK.length + " questions loaded" + source;
+    $("qcountBadge").style.borderColor = CSV_LOADED ? "rgba(0,245,255,.3)" : "rgba(255,215,0,.3)";
+    $("qcountBadge").style.background = CSV_LOADED ? "rgba(0,245,255,.12)" : "rgba(255,215,0,.12)";
+    $("qcountBadge").style.color = CSV_LOADED ? "var(--accent)" : "var(--gold)";
     renderSplash();
-    renderHOF("hofRows", false);
+    updateKnowledgeDisplay();
     initParticles();
   })
   .catch(err => {
@@ -1124,6 +1259,7 @@ go.addEventListener("click", () => {
   setTimeout(() => {
     $("roulette").classList.remove("gone");
     initWheel();
+    updateKnowledgeDisplay();
   }, 500);
 });
 
@@ -1282,6 +1418,18 @@ function answer(e) {
   if (isOk) {
     G.streak++; G.correct++;
     if (G.streak > G.bestStreak) G.bestStreak = G.streak;
+    
+    // Track hard questions
+    if (G.current.difficulty === "Hard") {
+      G.hardCorrect = (G.hardCorrect || 0) + 1;
+    }
+    
+    // Track comeback
+    if ((G.coldStreak || 0) >= 2) {
+      G.comeback = (G.comeback || 0) + 1;
+    }
+    G.coldStreak = 0;
+    
     const bonus = Math.min(G.streak - 1, 6) * 50;
     const earned = 100 + bonus;
     G.score += earned;
@@ -1289,6 +1437,7 @@ function answer(e) {
     if (G.streak >= 3) confetti();
   } else {
     G.streak = 0; G.wrong++;
+    G.coldStreak = (G.coldStreak || 0) + 1;
     G.score = Math.max(0, G.score - 100);
     burst("ng", "−$100");
   }
@@ -1342,10 +1491,12 @@ function hud() {
   ["sc","stk"].forEach(id => {
     const e=$(id); e.classList.remove("bmp"); void e.offsetWidth; e.classList.add("bmp");
   });
+  updateKnowledgeDisplay();
 }
 
 /* End Game */
 function endGame() {
+  G.completed = true;
   saveLB();
   $("game").style.display = "none";
   $("done").classList.remove("gone");
@@ -1362,6 +1513,7 @@ function endGame() {
     : pct >= 50
     ? "Good effort! Keep practicing."
     : "Keep going — every game makes you stronger!";
+  updateKnowledgeDisplay();
   if (pct >= 85) confetti();
 }
 
@@ -1371,10 +1523,12 @@ $("playAgain").addEventListener("click", () => {
   shuffle(BANK);
   G.score = 1000; G.streak = 0; G.bestStreak = 0;
   G.correct = 0; G.wrong = 0; G.qIdx = 0;
+  G.coldStreak = 0; G.comeback = 0; G.hardCorrect = 0; G.completed = false;
   setTimeout(() => {
     $("roulette").classList.remove("gone");
     drawWheel(0);
     $("spinBtn").disabled = false;
+    updateKnowledgeDisplay();
   }, 500);
 });
 
